@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="app">
+<head>
+	<title>发布中心</title>
+	<link rel="stylesheet" href="css/bootstrap.css"/>
+	<link rel="stylesheet" href="css/app.css"/>
+	<script type="text/javascript" src="lib/angular.js"></script>
+	<script type="text/javascript" src="lib/app.js"></script>
+</head>
+<body ng-controller="appCtrl">
+	<div class="container">
+		<div class="row">
+			<div class="col-md-12 base-btn">
+				<h3>基本操作</h3>
+				<hr />
+				<div class="col-md-5">
+					<form role="form" class="form-horizontal">
+						<div class="form-group">
+							<label class="class-col-2 control-label">软件开/关机 : </label>
+							<button type="button" class="btn btn-default" ng-click="turnOn()">开机</button>
+							<button type="button" class="btn btn-default" ng-click="turnOff()">关机</button>
+
+						</div>
+						<div class="form-group">
+							<label class="class-col-2 control-label">校正时间 : </label>
+							<button type="button" class="btn btn-default">校正</button>
+
+						</div>
+
+						<div class="form-group">
+							<label class="class-col-2 control-label">控制器时间 : </label>
+							<button type="button" class="btn btn-default">获取</button>
+
+						</div>
+
+						<div class="form-group">
+							<label class="class-col-2 control-label">控制器状态 : </label>
+							<button type="button" class="btn btn-default">获取</button>
+
+						</div>
+						<div class="form-group">
+							<label class="class-col-2 control-label">控制器亮度 : </label>
+							<button type="button" class="btn btn-default">获取</button>
+
+						</div>
+						<div class="form-group">
+							<label class="class-col-2 control-label">手动调节亮度 : </label>
+							<button type="button" class="btn btn-default">确定</button>
+
+						</div>
+						<div class="form-group">
+							<label class="class-col-2 control-label">自动调节亮度 : </label>
+							<button type="button" class="btn btn-default">确定</button>
+
+						</div>
+						<div class="form-group">
+							<label class="class-col-2 control-label">控制器屏幕参数 : </label>
+							<button type="button" class="btn btn-default">获取</button>
+
+						</div>
+						<div class="form-group">
+							<label class="class-col-2 control-label">屏幕当前播放内容截图 : </label>
+							<button type="button" class="btn btn-default">获取</button>
+
+						</div>
+						<div class="form-group">
+							<label class="class-col-2 control-label">本平台、工控机及其下属屏幕配置 : </label>
+							<button type="button" class="btn btn-default" ng-click="getConfig()">获取</button>
+						</div>
+					</form>
+
+				</div>
+				<div class="col-md-6 showinfo">
+					<div class="col-md-12">
+						<h4 class="col-md-6">中转平台IP：<small>{{config.ip}}</small></h4>
+						<h4 class="col-md-5">中转平台Port：<small>{{config.port}}</small></h4>
+					</div>
+					<div class="col-md-12">
+						<h4>工控机信息：</h4>
+						<div class="panel panel-defualt" ng-repeat="machine in config.machines">
+							<div class="panel-heading">
+								<h5>工控机{{$index + 1}}</h5>
+							</div>
+							<div class="panel-body">
+								<h5 class="col-md-6">IP:<small>{{machine.machine.ip}}</small></h5>
+								<h5>Port:<small>{{machine.machine.port}}</small></h5>
+							</div>
+							<table class="table">
+							<thead>
+								<tr><th>屏幕ID</th>
+								<th>x(坐标)</th>
+								<th>y(坐标)</th>
+								<th>w(宽)</th>
+								<th>y(高度)</th>
+								<th>position</th></tr>
+							</thead>
+								<tbody>
+									<tr ng-repeat="screen in machine.machine.screens">
+										<td>{{screen.id}}</td>
+										<td>{{screen.x}}</td>
+										<td>{{screen.y}}</td>
+										<td>{{screen.w}}</td>
+										<td>{{screen.h}}</td>
+										<td>{{screen.position}}</td>
+									</tr>
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+			</div>
+			
+		</div>
+	</div>
+</body>
+</html>

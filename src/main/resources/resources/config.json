@@ -1,0 +1,20 @@
+{
+    "commands":[
+        {
+            "ip": "192.168.30.224",
+            "id": [1, 2, 5],
+            "cmd": "0x01",
+            "data": ""
+        },
+        {
+            "ip": "192.168.30.36",
+            "id": [4, 5, 7, 8],
+            "cmd": "0x03",
+            "data": 1
+        }
+    ],
+    "resources": [
+        {"filename": "文件名称", "filepath": "文件路径", "filetype": 1},
+        {"filename": "文件名称", "filepath": "文件路径", "filetype": 0}
+    ]
+}
