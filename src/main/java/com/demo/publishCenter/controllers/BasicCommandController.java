@@ -21,53 +21,52 @@ public class BasicCommandController {
 
 	@RequestMapping("/turnOn")
 	public void turnOn(HttpServletRequest req, HttpServletResponse res){
-		InputStream is = this.getClass().getClassLoader().getResourceAsStream("resources\\config.json");
-		BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-		String line;
-		String output = "";
-		try{
-			while((line = reader.readLine()) != null){
-				line = line.replace("\n", "")
-						.replace("\t", "")
-						.replace(" ", "");
-				output += line;
-			}
-
-		}catch(Exception e){
-			e.printStackTrace();
-		}
-		JSONObject configObj = JSONObject.fromObject(output);
-		sender.sendJson(output, "192.168.30.224", 5000);
+		String config = req.getParameter("config");
+		System.out.println(config);
+		sender.sendJson(config, "192.168.30.224", 5000);
 	}
 
 	@RequestMapping("/turnOff")
-	public void turnOff(){
+	public void turnOff(HttpServletRequest req, HttpServletResponse res){
+		String config = req.getParameter("config");
+		System.out.println(config);
+		sender.sendJson(config, "192.168.30.224", 5000);
 
 	}
 
 	@RequestMapping("/time")
-	public void getTime(){
-
+	public void getTime(HttpServletRequest req, HttpServletResponse res){
+		String config = req.getParameter("config");
+		System.out.println(config);
+		sender.sendJson(config, "192.168.30.224", 5000);
 	}
 
 	@RequestMapping("/brightness")
-	public void getBrightness(){
-
+	public void getBrightness(HttpServletRequest req, HttpServletResponse res){
+		String config = req.getParameter("config");
+		System.out.println(config);
+		sender.sendJson(config, "192.168.30.224", 5000);
 	}
 
 	@RequestMapping("/setBrightness")
-	public void setBrightness(){
-
+	public void setBrightness(HttpServletRequest req, HttpServletResponse res){
+		String config = req.getParameter("config");
+		System.out.println(config);
+		sender.sendJson(config, "192.168.30.224", 5000);
 	}
 
 	@RequestMapping("autoBrightness")
-	public void autoBrightness(){
-
+	public void autoBrightness(HttpServletRequest req, HttpServletResponse res){
+		String config = req.getParameter("config");
+		System.out.println(config);
+		sender.sendJson(config, "192.168.30.224", 5000);
 	}
 
 	@RequestMapping("/screenShot")
-	public void screenShot(){
-
+	public void screenShot(HttpServletRequest req, HttpServletResponse res){
+		String config = req.getParameter("config");
+		System.out.println(config);
+		sender.sendJson(config, "192.168.30.224", 5000);
 	}
 
 	@RequestMapping("/serverConfig")

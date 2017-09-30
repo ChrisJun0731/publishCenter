@@ -30,6 +30,42 @@ public class Receiver {
 	}
 
 	/**
+	 * 工控机端接受数据帧，并将接受到的帧转换为字符串
+	 * 打印出来
+	 */
+	public String receiveFramesAndPrintJson(){
+		String json;
+		while (true) {
+			byte[] frame = receiveFrame();
+			if (isValid(frame)) {
+				System.out.println("有效帧！");
+				parseFrame(frame);
+				responseSuccess();
+				if (isFirstBlock()) {
+					list = new ArrayList();
+					list.add(getBlock());
+					if (isLastBlock()) {
+						json = convertByte2String(list);
+						System.out.println(json);
+						break;
+					}
+				} else {
+					list.add(getBlock());
+					if (isLastBlock()) {
+						json = convertByte2String(list);
+						System.out.println(json);
+						break;
+					}
+				}
+			} else {
+				System.out.println("无效帧！");
+				responseFailed();
+			}
+		}
+		return json;
+	}
+
+	/**
 	 * 将获得的帧数据转为string字符串
 	 */
 	public void receiveFramesAndSendJson() {
