@@ -1,7 +1,7 @@
 package com.demo.publishCenter.controllers;
 
-import com.demo.publishCenter.services.Sender;
-import net.sf.json.JSONObject;
+import com.demo.publishCenter.services.PublishCenter;
+import com.demo.publishCenter.util.Sender;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -16,21 +16,22 @@ import java.io.InputStreamReader;
  */
 @RestController
 public class BasicCommandController {
+
 	@Autowired
-	private Sender sender;
+	private PublishCenter center;
 
 	@RequestMapping("/turnOn")
 	public void turnOn(HttpServletRequest req, HttpServletResponse res){
 		String config = req.getParameter("config");
 		System.out.println(config);
-		sender.sendJson(config, "192.168.30.224", 5000);
+		send(config);
 	}
 
 	@RequestMapping("/turnOff")
 	public void turnOff(HttpServletRequest req, HttpServletResponse res){
 		String config = req.getParameter("config");
 		System.out.println(config);
-		sender.sendJson(config, "192.168.30.224", 5000);
+		send(config);
 
 	}
 
@@ -38,35 +39,35 @@ public class BasicCommandController {
 	public void getTime(HttpServletRequest req, HttpServletResponse res){
 		String config = req.getParameter("config");
 		System.out.println(config);
-		sender.sendJson(config, "192.168.30.224", 5000);
+		send(config);
 	}
 
 	@RequestMapping("/brightness")
 	public void getBrightness(HttpServletRequest req, HttpServletResponse res){
 		String config = req.getParameter("config");
 		System.out.println(config);
-		sender.sendJson(config, "192.168.30.224", 5000);
+		send(config);
 	}
 
 	@RequestMapping("/setBrightness")
 	public void setBrightness(HttpServletRequest req, HttpServletResponse res){
 		String config = req.getParameter("config");
 		System.out.println(config);
-		sender.sendJson(config, "192.168.30.224", 5000);
+		send(config);
 	}
 
 	@RequestMapping("autoBrightness")
 	public void autoBrightness(HttpServletRequest req, HttpServletResponse res){
 		String config = req.getParameter("config");
 		System.out.println(config);
-		sender.sendJson(config, "192.168.30.224", 5000);
+		send(config);
 	}
 
 	@RequestMapping("/screenShot")
 	public void screenShot(HttpServletRequest req, HttpServletResponse res){
 		String config = req.getParameter("config");
 		System.out.println(config);
-		sender.sendJson(config, "192.168.30.224", 5000);
+		send(config);
 	}
 
 	@RequestMapping("/serverConfig")
@@ -87,5 +88,18 @@ public class BasicCommandController {
 			e.printStackTrace();
 		}
 		return output;
+	}
+
+	@RequestMapping("/sendPlayList")
+	public void sendPlayList(HttpServletRequest req, HttpServletResponse resp){
+		String config = req.getParameter("config");
+		System.out.println(config);
+		send(config);
+	}
+
+	public void send(String config){
+		center.setServerIp("192.168.30.224");
+		center.setServerPort(5000);
+		center.sendAndGetReply(config);
 	}
 }

@@ -10,7 +10,7 @@ app.controller('appCtrl', function($scope, $http){
     };
 
     $scope.turnOn = function(){
-        var config = $scope.createConfig("0x03", 1);
+        var config = $scope.createConfig("0x03", {switch: 1});
         $http.get('/turnOn', {params: {config: config}}, function(res){
             return res.data;
         }).then(function(rs){
@@ -19,7 +19,7 @@ app.controller('appCtrl', function($scope, $http){
     };
 
     $scope.turnOff = function(){
-        var config = $scope.createConfig("0x03", 0);
+        var config = $scope.createConfig("0x03", {switch: 0});
         $http.get('/turnOff', {params: {config: config}}, function(res){
             return res.data;
         }).then(function(rs){
@@ -72,6 +72,34 @@ app.controller('appCtrl', function($scope, $http){
         });
     }
 
+    $scope.sendPlayList = function(){
+        var data = [
+                        {
+                            "program":{
+                                "stayTime": 100,
+                                "units": [
+                                    {
+                                        "video": {
+                                            "x": 0,
+                                            "y": 0,
+                                            "h": 192,
+                                            "w": 360,
+                                            "filename": "1.avi"
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    ];
+        var resources = [{"filename": "1.avi", "filepath": "1.avi", "filetype": 1}];
+        var config = $scope.createConfig("0x31", data, resources);
+        $http.get('/sendPlayList', {params: {config: config}}, function(res){
+            return res.data;
+        }).then(function(rs){
+            return rs.data;
+        });
+    }
+
     $scope.createConfig = function(cmd, data){
         var machines = new Array();
         var config = new Config();
@@ -85,14 +113,38 @@ app.controller('appCtrl', function($scope, $http){
                     machineObj.id.push(screen.id);
                 }
             });
-            machines.push(machineObj);
-
+            if(machineObj.id.length != 0){
+                machines.push(machineObj);
+            }
         });
         config.commands = machines;
-        config.resources.push($scope.videoName);
+        config.resources = [];
         console.log(JSON.stringify(config));
         return JSON.stringify(config);
     };
+
+    $scope.createConfig = function(cmd, data, resources){
+            var machines = new Array();
+            var config = new Config();
+            angular.forEach($scope.config.machines, function(machine){
+                var machineObj = new Machine();
+                machineObj.ip = machine.machine.ip;
+                machineObj.cmd = cmd;
+                machineObj.data = data;
+                angular.forEach(machine.machine.screens, function(screen){
+                    if(screen.selected == true){
+                        machineObj.id.push(screen.id);
+                    }
+                });
+                if(machineObj.id.length != 0){
+                    machines.push(machineObj);
+                }
+            });
+            config.commands = machines;
+            config.resources = resources;
+            console.log(JSON.stringify(config));
+            return JSON.stringify(config);
+        };
 
     function Machine(){
         this.id = new Array();
