@@ -3,12 +3,16 @@ package com.demo.publishCenter.services;
 
 import com.demo.publishCenter.util.Receiver;
 import com.demo.publishCenter.util.Sender;
+import org.apache.log4j.LogManager;
+import org.apache.log4j.Logger;
 import org.springframework.stereotype.Service;
 
 import java.net.Socket;
 
 @Service
 public class PublishCenter {
+
+	private final Logger logger = LogManager.getLogger(PublishCenter.class);
 
 	private Sender sender;
 	private Receiver receiver;
@@ -26,11 +30,15 @@ public class PublishCenter {
 			byte[] frame2 = receiver.receiveFrame();
 			byte[] frameBody = receiver.parseAndUnescapeFrameBody(frame2);
 
-			System.out.println("收到的返回信息："+ new String(frameBody));
+			logger.info("收到的返回信息："+ new String(frameBody, "GBK"));
+
+			//关闭socket连接
+			socket.shutdownInput();
+			socket.shutdownOutput();
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
 	}
 
 	public String getServerIp() {

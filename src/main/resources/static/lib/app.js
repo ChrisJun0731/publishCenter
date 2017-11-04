@@ -36,6 +36,15 @@ app.controller('appCtrl', function($scope, $http){
         });
     };
 
+    $scope.getStatus = function(){
+        var config = $scope.createConfig("0x15", null);
+        $http.get('/status', {params: {config: config}}, function(res){
+            return res.data;
+            }).then(function(rs){
+                return rs.data;
+        });
+    }
+
     $scope.getBrightness = function(){
         var config = $scope.createConfig("0x09", null);
         $http.get('/brightness', {params: {config: config}}, function(res){
@@ -46,7 +55,7 @@ app.controller('appCtrl', function($scope, $http){
     };
 
     $scope.setBrightness = function(){
-        var config = $scope.createConfig("0x11", {brightness: 100});
+        var config = $scope.createConfig("0x11", {brightness: 255});
         $http.get('/setBrightness', {params: {config: config}}, function(res){
             return res.data;
         }).then(function(rs){
@@ -54,14 +63,23 @@ app.controller('appCtrl', function($scope, $http){
         });
     };
 
-    $scope.autoBrightness = function(){
-        var config = $scope.createConfig("0x13", null);
-        $http.get('/autoBrightness', {params: {config: config}}, function(res){
+//    $scope.autoBrightness = function(){
+//        var config = $scope.createConfig("0x13", null);
+//        $http.get('/autoBrightness', {params: {config: config}}, function(res){
+//            return res.data;
+//        }).then(function(rs){
+//            return rs.data;
+//        });
+//    };
+
+    $scope.getScreenParameter = function(){
+        var config = $scope.createConfig("0x01");
+        $http.get('/screenParameter', {params: {config: config}}, function(res){
             return res.data;
         }).then(function(rs){
             return rs.data;
         });
-    };
+    }
 
     $scope.screenShot = function(){
         var config = $scope.createConfig("0x17", null);
@@ -83,15 +101,15 @@ app.controller('appCtrl', function($scope, $http){
                                             "x": 0,
                                             "y": 0,
                                             "h": 192,
-                                            "w": 360,
-                                            "filename": "1.avi"
+                                            "w": 320,
+                                            "filename": "222.mp4"
                                         }
                                     }
                                 ]
                             }
                         }
                     ];
-        var resources = [{"filename": "1.avi", "filepath": "1.avi", "filetype": 1}];
+        var resources = [{"filename": "222.mp4", "filepath": "/resources/222.mp4", "filetype": 1}];
         var config = $scope.createConfig("0x31", data, resources);
         $http.get('/sendPlayList', {params: {config: config}}, function(res){
             return res.data;

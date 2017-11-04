@@ -1,5 +1,6 @@
 package com.demo.publishCenter.util;
 
+import java.io.IOException;
 import java.io.OutputStream;
 
 public class Sender {
@@ -16,7 +17,7 @@ public class Sender {
 	 * @param json json字符串
 	 */
 	public void sendJson(String json){
-		send(combine(json.getBytes()));
+		send(combineSendFrame(json.getBytes()));
 	}
 
 	/**
@@ -46,18 +47,25 @@ public class Sender {
 		return output;
 	}
 
+	public byte[] combineSendFrame(byte[] frameBody){
+		return combine(new byte[]{0x51}, frameBody);
+	}
+
+	public byte[] combineResponseFrame(byte[] frameBody){
+		return combine(new byte[]{0x52}, frameBody);
+	}
+
 	/**
 	 * 组装帧数据
 	 *
 	 * @param frameBody 帧体
 	 * @return 帧数据
 	 */
-	public byte[] combine(byte[] frameBody) {
+	public byte[] combine(byte[] cmd, byte[] frameBody) {
 		byte[] escapeFrameBody = escape(frameBody);
 		byte[] frame = new byte[3 + escapeFrameBody.length];
 		byte[] crc_frame = new byte[5 + escapeFrameBody.length];
 		byte[] start = new byte[]{(byte) 0xaa};
-		byte[] cmd = new byte[]{(byte) 0x51};
 		byte[] end = new byte[]{(byte) 0xcc};
 		byte[] crc;
 		System.arraycopy(start, 0, frame, 0, 1);
@@ -79,6 +87,28 @@ public class Sender {
 		try {
 			this.os.write(frame);
 			this.os.flush();
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * 刷新数据流
+	 */
+	public void flush(){
+		try {
+			this.os.flush();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * 关闭数据流
+	 */
+	public void close(){
+		try{
+			this.os.close();
 		}catch(Exception e){
 			e.printStackTrace();
 		}

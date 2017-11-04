@@ -42,6 +42,13 @@ public class BasicCommandController {
 		send(config);
 	}
 
+	@RequestMapping("/status")
+	public void getStatus(HttpServletRequest req, HttpServletResponse res){
+		String config = req.getParameter("config");
+		System.out.println(config);
+		send(config);
+	}
+
 	@RequestMapping("/brightness")
 	public void getBrightness(HttpServletRequest req, HttpServletResponse res){
 		String config = req.getParameter("config");
@@ -56,8 +63,15 @@ public class BasicCommandController {
 		send(config);
 	}
 
-	@RequestMapping("autoBrightness")
+	@RequestMapping("/autoBrightness")
 	public void autoBrightness(HttpServletRequest req, HttpServletResponse res){
+		String config = req.getParameter("config");
+		System.out.println(config);
+		send(config);
+	}
+
+	@RequestMapping("/screenParameter")
+	public void getScreenParameter(HttpServletRequest req, HttpServletResponse res){
 		String config = req.getParameter("config");
 		System.out.println(config);
 		send(config);
