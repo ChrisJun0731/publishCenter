@@ -2,6 +2,7 @@ package com.demo.publishCenter.controllers;
 
 import com.demo.publishCenter.services.PublishCenter;
 import com.demo.publishCenter.util.Sender;
+import net.sf.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -10,6 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 
 /**
  * Created by Administrator on 2017/9/29.
@@ -19,6 +21,8 @@ public class BasicCommandController {
 
 	@Autowired
 	private PublishCenter center;
+	@Autowired
+	private Sender sender;
 
 	@RequestMapping("/turnOn")
 	public void turnOn(HttpServletRequest req, HttpServletResponse res){
@@ -111,9 +115,31 @@ public class BasicCommandController {
 		send(config);
 	}
 
+	@RequestMapping("/convertMessage")
+	public String convertMessage(HttpServletRequest req, HttpServletResponse res) throws UnsupportedEncodingException {
+		String message = req.getParameter("message");
+		String str = "";
+		if(message!=null){
+			byte[] frame = sender.combineSendFrame(message.getBytes("GBK"));
+			for (int i = 0; i < frame.length; i++) {
+				String temp = Integer.toHexString(frame[i]);
+				if(temp.length() == 8){
+					temp = temp.substring(6);
+				}
+				str += temp + " ";
+			}
+			str = str.substring(0, str.length() - 1);
+		}
+		return "{\"frame\":\"" + str + "\"}";
+	}
+
 	public void send(String config){
-		center.setServerIp("192.168.30.224");
-		center.setServerPort(5000);
+		String json = getServerConfig();
+		JSONObject obj = JSONObject.fromObject(json);
+		String ip = (String)obj.get("ip");
+		int port = (Integer)obj.get("port");
+		center.setServerIp(ip);
+		center.setServerPort(port);
 		center.sendAndGetReply(config);
 	}
 }

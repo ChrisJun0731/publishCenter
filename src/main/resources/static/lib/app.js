@@ -11,6 +11,12 @@ app.controller('appCtrl', function($scope, $http){
 
     $scope.turnOn = function(){
         var config = $scope.createConfig("0x03", {switch: 1});
+        //构造无效的json测试1(可以被JSONUtils检测出来)
+        config = config.substr(1, config.lenght-1);
+        //构造无效json测试2(不能被JSONUtils检测出来)
+//        config = "{commands:[], array}";
+        //构造值为空的json测试
+        config = "{commands:[], array:[]}";
         $http.get('/turnOn', {params: {config: config}}, function(res){
             return res.data;
         }).then(function(rs){
@@ -90,6 +96,17 @@ app.controller('appCtrl', function($scope, $http){
         });
     }
 
+    $scope.convertMessage = function(){
+        var message = $scope.sendMessage;
+        $http.get('/convertMessage', {params: {message: message}}, function(res){
+            return res.data;
+        }).then(function(rs){
+            console.log(rs);
+            console.log(rs.data.frame);
+            $scope.frame = rs.data.frame;
+        });
+    }
+
     $scope.sendPlayList = function(){
         var data = [
                         {
@@ -102,14 +119,15 @@ app.controller('appCtrl', function($scope, $http){
                                             "y": 0,
                                             "h": 192,
                                             "w": 320,
-                                            "filename": "222.mp4"
+                                            "filename": "666.mp4"
                                         }
                                     }
                                 ]
                             }
                         }
                     ];
-        var resources = [{"filename": "222.mp4", "filepath": "/resources/222.mp4", "filetype": 1}];
+        var resources = [{"filename": "666.mp4", "filepath": "/resources/666.mp4", "filetype": 1}];
+//        var resources = [];
         var config = $scope.createConfig("0x31", data, resources);
         $http.get('/sendPlayList', {params: {config: config}}, function(res){
             return res.data;
@@ -151,10 +169,10 @@ app.controller('appCtrl', function($scope, $http){
                 machineObj.data = data;
                 angular.forEach(machine.machine.screens, function(screen){
                     if(screen.selected == true){
-                        machineObj.id.push(screen.id);
+                        machineObj.ids.push(screen.id);
                     }
                 });
-                if(machineObj.id.length != 0){
+                if(machineObj.ids.length != 0){
                     machines.push(machineObj);
                 }
             });
@@ -165,7 +183,7 @@ app.controller('appCtrl', function($scope, $http){
         };
 
     function Machine(){
-        this.id = new Array();
+        this.ids = new Array();
         this.ip = "";
         this.cmd = "";
         this.data = new Object();

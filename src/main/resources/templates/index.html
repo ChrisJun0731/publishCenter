@@ -67,6 +67,12 @@
 							<label class="class-col-2 control-label">发送播放列表测试</label>
 							<button type="button" class="btn btn-default" ng-click="sendPlayList()">发送播放列表</button>
 						</div>
+
+						<div class="form-group">
+							输入要发送的消息:<input typed="text" ng-model="sendMessage"/>
+							<button type="button" class="btn btn-default" ng-click="convertMessage()">转换为报文</button><br/>
+							转换后的报文:<textarea ng-model="frame" cols="100" rows="3"></textarea>
+						</div>
 					</form>
 
 				</div>

@@ -32,10 +32,12 @@ public class SenderCallable implements Callable {
 		JSONArray commands = (JSONArray) configObj.get("commands");
 		JSONObject ipc = (JSONObject) commands.get(0);
 		String ip = (String) ipc.get("ip");
-		Sender sender = null;
-		Receiver receiver = null;
+		Sender sender;
+		Receiver receiver;
 		try {
 			Socket socket = new Socket(ip, defaultPort);
+			//设置超时时间5秒
+			socket.setSoTimeout(5000);
 			InputStream is = socket.getInputStream();
 			OutputStream os = socket.getOutputStream();
 			sender = new Sender(os);
@@ -47,45 +49,25 @@ public class SenderCallable implements Callable {
 			do {
 
 				if (sendLimit > 3) {
-					logger.error("向工控机发送的消息失败次数超过3次，停止发送此消息！");
+					logger.error("向IPC[" + ip + "]发送的消息失败次数超过3次，停止发送此消息！");
 					break;
 				}
 				sendLimit++;
-
-				logger.info("开始向工控机发送信息。。。");
-				logger.info("打印向工控机发送的字节:");
-				byte[] sendFrame = sender.combineSendFrame(config.getBytes());
-				logger.info("发送的帧的长度为:" + sendFrame.length);
-				for(int i=0; i<sendFrame.length; i++){
-					System.out.print(sendFrame[i] + " ");
-					if((i+1) % 20==0){
-						System.out.println();
-					}
-				}
 				sender.send(sender.combineSendFrame(config.getBytes()));
-				//发送一个非法的帧测试
-//				sender.send(new byte[]{0x11});
-				logger.info("信息发送完毕！");
-				logger.info("等待工控机反馈该信息是否发送成功");
+				logger.info("向IPC[" + ip + "]信息发送完毕！");
+				logger.info("等待IPC[" + ip + "]响应消息否发送成功。。。");
 				byte[] frame = receiver.receiveFrame();
-				logger.info("收到工控机的反馈信息！");
-				System.out.println();
-				System.out.println("收到的反馈信息的长度:"+frame.length);
-				System.out.println("打印反馈信息的内容：");
-				for(int i=0; i<frame.length; i++){
-					System.out.print(frame[i] + " ");
-					if((i+1)%10==0){
-						System.out.println();
-					}
-				}
-				System.out.println();
 
 				int frameNum = receiver.getFrameNum(frame);
+				logger.info("IPC[" + ip + "]返回的帧数：" + frameNum + "帧长度:" + frame.length);
 				if (frameNum == 1) {
 					frameBody = receiver.parseAndUnescapeFrameBody(frame);
 					if (frameBody[0] == 1) {
+						logger.info("IPC[" + ip + "]响应消息发送成功！等待IPC发送返回的消息。。。");
 						secondFrame = receiver.receiveFrame();
+						logger.info("收到IPC[" + ip + "]返回的消息。");
 					} else {
+						logger.info("IPC[" + ip + "]响应消息发送失败！中转平台准备重新发送消息");
 						continue;
 					}
 				} else {
@@ -94,22 +76,30 @@ public class SenderCallable implements Callable {
 
 				//如果工控机发送的json帧不合法，则回复工控机发送失败，并重新接收
 				int receiveLimit = 0;
-				while(!receiver.isValid(secondFrame)){
-					if(receiveLimit > 3){
-						logger.info("工控机发送无效的帧的次数超过3次，停止接收");
+
+				boolean isValid = receiver.isValid(secondFrame);
+				logger.info("检查IPC[" + ip + "]返回的消息是否有效，true有效，false无效：" + isValid);
+				while (!isValid) {
+
+					if (receiveLimit > 3) {
+						logger.info("IPC[" + ip + "]发送无效消息超过3次，中转平台将停止接收此无效消息！");
 						break;
 					}
 					receiveLimit++;
-					logger.info("向工控机回复发送的消息无效:");
-					sender.send(sender.combineResponseFrame(new byte[]{(byte)0x00}));
-					logger.info("等待接受工控机重新发送json");
+					logger.info("向IPC[" + ip + "]响应消息发送失败！");
+					sender.send(sender.combineResponseFrame(new byte[]{(byte) 0x00}));
+					logger.info("等待接受IPC[" + ip + "]重新发送消息。。。");
 					secondFrame = receiver.receiveFrame();
+					logger.info("收到IPC[" + ip + "]重新发送的消息。");
+					isValid = receiver.isValid(secondFrame);
+					logger.info("再次检查收到的消息是否有效，true有效，false无效：" + isValid);
 				}
 
-				//回复工控机发送成功
-				logger.info("回复工控机消息发送成功！");
-				sender.send(sender.combineResponseFrame(new byte[]{(byte)0x01}));
-				json = receiver.conventFrameBodyToString(receiver.parseAndUnescapeFrameBody(secondFrame));
+				if (isValid) {
+					logger.info("向IPC[" + ip + "]响应消息发送成功！");
+					sender.send(sender.combineResponseFrame(new byte[]{(byte) 0x01}));
+					json = receiver.conventFrameBodyToString(receiver.parseAndUnescapeFrameBody(secondFrame));
+				}
 			} while (frameBody[0] == 0);
 
 			//关闭socket
@@ -118,9 +108,14 @@ public class SenderCallable implements Callable {
 			socket.close();
 
 		} catch (Exception e) {
-			logger.error("与工控机建立连接失败：" + e.getMessage());
+			logger.error("与IPC[" + ip + "]建立连接失败或读写超时：" + e.getMessage());
+		} finally {
+			json = json.replace("\n", "")
+					.replace("\r", "")
+					.replace("\t", "")
+					.replace(" ", "");
+			logger.info("从IPC[" + ip + "]接收到消息:" + json);
+			return json;
 		}
-
-		return json;
 	}
 }

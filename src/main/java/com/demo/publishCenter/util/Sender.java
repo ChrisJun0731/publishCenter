@@ -1,12 +1,17 @@
 package com.demo.publishCenter.util;
 
+import org.springframework.stereotype.Service;
+
 import java.io.IOException;
 import java.io.OutputStream;
-
+@Service
 public class Sender {
 
 	private OutputStream os;
 	private MyUtil util = new MyUtil();
+
+
+	public Sender(){}
 
 	public Sender(OutputStream os) {
 		this.os = os;
@@ -17,7 +22,13 @@ public class Sender {
 	 * @param json json字符串
 	 */
 	public void sendJson(String json){
+		//发送正确帧格式
 		send(combineSendFrame(json.getBytes()));
+
+		//发送错误帧格式
+//		byte[] frame = combineSendFrame(json.getBytes());
+//		frame[0] = (byte)0xab;
+//		send(frame);
 	}
 
 	/**
