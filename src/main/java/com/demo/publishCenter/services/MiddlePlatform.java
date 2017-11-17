@@ -7,8 +7,8 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONException;
 import net.sf.json.JSONObject;
 import net.sf.json.util.JSONUtils;
-import org.apache.log4j.LogManager;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -24,28 +24,37 @@ import java.util.concurrent.Future;
 public class MiddlePlatform {
 
 	private final Logger logger = LogManager.getLogger(MiddlePlatform.class);
-
+	private ServerSocket server = null;
 	/**
 	 * 启动中转平台
 	 */
 	public void work() {
 
-		logger.info("中转平台已启动，等待来自发布中心的消息。。。");
-		Sender sender = null;
-		Receiver receiver = null;
+		logger.info("中转平台已启动！");
 		try {
-			ServerSocket server = new ServerSocket(5000);
+			server = new ServerSocket(5000);
+		} catch (IOException e) {
+			logger.error("请确认5000的端口号是否被占用! "+ e.getMessage());
+		}
+		createSockets(server);
+	}
+
+	public void createSockets(ServerSocket server){
+		try{
 			while (true) {
 				Socket socket = server.accept();
+				//设置读写超时时间为10秒
+				socket.setSoTimeout(10000);
 
 				System.out.println("**********************************************************************");
 				System.out.println("************************中转平台开启一个消息处理线程***********************");
 				System.out.println("**********************************************************************");
 
-				receiver = new Receiver(socket.getInputStream());
-				sender = new Sender(socket.getOutputStream());
+				Receiver receiver = new Receiver(socket.getInputStream());
+				Sender sender = new Sender(socket.getOutputStream());
 
 				List<String> messageFromIPC = new ArrayList();
+				logger.info("等待来自发布中心的消息...");
 				String messageFromCenter = receiveMessage(receiver, sender, socket.getOutputStream());
 				if (messageFromCenter == null) {
 					String reply = "发布中心发送的消息无效，此消息不会被平台处理和转发！";
@@ -103,13 +112,14 @@ public class MiddlePlatform {
 				//关闭socket连接
 				closeSocket(socket);
 
-
 				System.out.println("**********************************************************************");
 				System.out.println("************************中转平台结束一个消息处理线程**********************");
 				System.out.println("**********************************************************************");
 			}
 		} catch (Exception e) {
-			logger.error(e.getMessage());
+			logger.error("与发布中心进行读写时发生异常: " + e.getMessage());
+			logger.info("本次连接异常，将被关闭！请重新发起连接！");
+			this.createSockets(server);
 		} finally {
 			logger.error("中转平台停止运行，需要手动重启！");
 

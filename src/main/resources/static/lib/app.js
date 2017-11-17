@@ -12,11 +12,11 @@ app.controller('appCtrl', function($scope, $http){
     $scope.turnOn = function(){
         var config = $scope.createConfig("0x03", {switch: 1});
         //构造无效的json测试1(可以被JSONUtils检测出来)
-        config = config.substr(1, config.lenght-1);
+//        config = config.substr(1, config.lenght-1);
         //构造无效json测试2(不能被JSONUtils检测出来)
 //        config = "{commands:[], array}";
         //构造值为空的json测试
-        config = "{commands:[], array:[]}";
+//        config = "{commands:[], array:[]}";
         $http.get('/turnOn', {params: {config: config}}, function(res){
             return res.data;
         }).then(function(rs){
@@ -155,6 +155,8 @@ app.controller('appCtrl', function($scope, $http){
         });
         config.commands = machines;
         config.resources = [];
+        config.ip = $scope.config.ip;
+        config.port = $scope.config.port;
         console.log(JSON.stringify(config));
         return JSON.stringify(config);
     };
@@ -178,7 +180,9 @@ app.controller('appCtrl', function($scope, $http){
             });
             config.commands = machines;
             config.resources = resources;
-            console.log(JSON.stringify(config));
+            config.ip = $scope.config.ip;
+            config.port = $scope.config.port;
+            console.log("客户端生成json: " + JSON.stringify(config));
             return JSON.stringify(config);
         };
 
@@ -190,6 +194,8 @@ app.controller('appCtrl', function($scope, $http){
     }
 
     function Config(){
+        this.ip = "";
+        this.port = 5000;
         this.commands = new Object();
         this.resources = new Array();
     }

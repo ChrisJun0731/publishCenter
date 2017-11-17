@@ -134,8 +134,7 @@ public class BasicCommandController {
 	}
 
 	public void send(String config){
-		String json = getServerConfig();
-		JSONObject obj = JSONObject.fromObject(json);
+		JSONObject obj = JSONObject.fromObject(config);
 		String ip = (String)obj.get("ip");
 		int port = (Integer)obj.get("port");
 		center.setServerIp(ip);

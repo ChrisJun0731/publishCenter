@@ -78,7 +78,7 @@
 				</div>
 				<div class="col-md-6 showinfo">
 					<div class="col-md-12">
-						<h4 class="col-md-6">中转平台IP：<small>{{config.ip}}</small></h4>
+						<h4 class="col-md-6">中转平台IP：<small><input type="text" ng-model="config.ip"/></small></h4>
 						<h4 class="col-md-5">中转平台Port：<small>{{config.port}}</small></h4>
 					</div>
 					<div class="col-md-12">
@@ -88,7 +88,7 @@
 								<h5>工控机{{$index + 1}}</h5>
 							</div>
 							<div class="panel-body">
-								<h5 class="col-md-6">IP:<small>{{machine.machine.ip}}</small></h5>
+								<h5 class="col-md-6">IP:<small><input type="text" ng-model="machine.machine.ip"/></small></h5>
 								<h5>Port:<small>{{machine.machine.port}}</small></h5>
 							</div>
 							<table class="table">
